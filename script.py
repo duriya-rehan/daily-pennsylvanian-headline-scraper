@@ -1,21 +1,13 @@
-"""
-Scrapes a headline from The Daily Pennsylvanian website and saves it to a 
-JSON file that tracks headlines over time.
-"""
-
 import os
 import sys
-
 import daily_event_monitor
-
 import bs4
 import requests
 import loguru
 
-
 def scrape_data_point():
     """
-    Scrapes the main headline from The Daily Pennsylvanian home page.
+    Scrapes the top headline from the 'News' section of The Daily Pennsylvanian home page.
 
     Returns:
         str: The headline text if found, otherwise an empty string.
@@ -26,14 +18,15 @@ def scrape_data_point():
 
     if req.ok:
         soup = bs4.BeautifulSoup(req.text, "html.parser")
-        target_element = soup.find("a", class_="frontpage-link")
-        data_point = "" if target_element is None else target_element.text
-        loguru.logger.info(f"Data point: {data_point}")
-        return data_point
-
+        news_section = soup.find("section", id="news")
+        if news_section:
+            target_element = news_section.find("a", class_="frontpage-link")
+            data_point = "" if target_element is None else target_element.text
+            loguru.logger.info(f"Data point: {data_point}")
+            return data_point
+    return ""
 
 if __name__ == "__main__":
-
     # Setup logger to track runtime
     loguru.logger.add("scrape.log", rotation="1 day")
 
