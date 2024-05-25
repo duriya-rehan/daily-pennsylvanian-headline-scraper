@@ -15,36 +15,23 @@ import loguru
 
 def scrape_data_point():
     """
-    Scrapes the main headline from The Daily Pennsylvanian home page.
-
+    Scrapes the headlines from the news section of The Daily Pennsylvanian home page.
     Returns:
-        str: The headline text if found, otherwise an empty string.
+        list: A list of headline texts if found, otherwise an empty list.
     """
     req = requests.get("https://www.thedp.com/section/news")
     loguru.logger.info(f"Request URL: {req.url}")
     loguru.logger.info(f"Request status code: {req.status_code}")
 
-    output = []
+    headlines = []
 
     if req.ok:
         soup = bs4.BeautifulSoup(req.text, "html.parser")
-        all_news = soup.find_all("h3", class_ = "standard-link")
-        for news in all_news:
-            news_map = {}
-            title = news.text
-            news_map["title"] = title
-            req2 = requests.get(news.find('a').get('href'))
-            soup2 = bs4.BeautifulSoup(req2.text, "html.parser")
-            article_info = soup2.find("article")
-            paragraphs = article_info.find_all("p")
-            full_text = ""
-            for paragraph in paragraphs:
-                full_text += paragraph.text
-            news_map["article_content"] = full_text
-            output.append(news_map)
+        target_elements = soup.find_all("h3", class_="entry-title")
+        headlines = [elem.text.strip() for elem in target_elements]
 
-        loguru.logger.info(f"Data point: {output}")
-        return output
+    loguru.logger.info(f"Data points: {headlines}")
+    return headlines
 
 
 if __name__ == "__main__":
