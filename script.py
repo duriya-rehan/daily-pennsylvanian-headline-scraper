@@ -1,32 +1,54 @@
+"""
+Scrapes a headline from The Daily Pennsylvanian website and saves it to a 
+JSON file that tracks headlines over time.
+"""
+
 import os
 import sys
+
 import daily_event_monitor
+
 import bs4
 import requests
 import loguru
 
+
 def scrape_data_point():
     """
-    Scrapes the top headline from the 'News' section of The Daily Pennsylvanian home page.
+    Scrapes the main headline from The Daily Pennsylvanian home page.
 
     Returns:
         str: The headline text if found, otherwise an empty string.
     """
-    req = requests.get("https://www.thedp.com")
+    req = requests.get("https://www.thedp.com/section/news")
     loguru.logger.info(f"Request URL: {req.url}")
     loguru.logger.info(f"Request status code: {req.status_code}")
 
+    output = []
+
     if req.ok:
         soup = bs4.BeautifulSoup(req.text, "html.parser")
-        news_section = soup.find("section", id="news")
-        if news_section:
-            target_element = news_section.find("a", class_="frontpage-link")
-            data_point = "" if target_element is None else target_element.text
-            loguru.logger.info(f"Data point: {data_point}")
-            return data_point
-    return ""
+        all_news = soup.find_all("h3", class_ = "standard-link")
+        for news in all_news:
+            news_map = {}
+            title = news.text
+            news_map["title"] = title
+            req2 = requests.get(news.find('a').get('href'))
+            soup2 = bs4.BeautifulSoup(req2.text, "html.parser")
+            article_info = soup2.find("article")
+            paragraphs = article_info.find_all("p")
+            full_text = ""
+            for paragraph in paragraphs:
+                full_text += paragraph.text
+            news_map["article_content"] = full_text
+            output.append(news_map)
+
+        loguru.logger.info(f"Data point: {output}")
+        return output
+
 
 if __name__ == "__main__":
+
     # Setup logger to track runtime
     loguru.logger.add("scrape.log", rotation="1 day")
 
@@ -41,7 +63,7 @@ if __name__ == "__main__":
     # Load daily event monitor
     loguru.logger.info("Loading daily event monitor")
     dem = daily_event_monitor.DailyEventMonitor(
-        "data/daily_pennsylvanian_headlines.json"
+        "data/full_news_json_list.json"
     )
 
     # Run scrape
