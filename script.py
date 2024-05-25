@@ -23,16 +23,12 @@ def scrape_data_point():
     loguru.logger.info(f"Request URL: {req.url}")
     loguru.logger.info(f"Request status code: {req.status_code}")
 
-    headlines = []
-
     if req.ok:
         soup = bs4.BeautifulSoup(req.text, "html.parser")
-        target_elements = soup.find_all("h3", class_="entry-title")
-        headlines = [elem.text.strip() for elem in target_elements]
-
-    loguru.logger.info(f"Data points: {headlines}")
-    return headlines
-
+        target_element = soup.find('a', class_='medium-link')
+        data_point = "" if target_element is None else target_element.text
+        loguru.logger.info(f"Data point: {data_point}")
+        return data_point
 
 if __name__ == "__main__":
 
