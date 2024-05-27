@@ -15,11 +15,12 @@ import loguru
 
 def scrape_data_point():
     """
-    Scrapes the headlines from the news section of The Daily Pennsylvanian home page.
+    Scrapes the main headline from The Daily Pennsylvanian MULTIMEDIA page.
+
     Returns:
-        list: A list of headline texts if found, otherwise an empty list.
+        str: The headline text if found, otherwise an empty string.
     """
-    req = requests.get("https://www.thedp.com/section/news")
+    req = requests.get("https://www.thedp.com/multimedia")
     loguru.logger.info(f"Request URL: {req.url}")
     loguru.logger.info(f"Request status code: {req.status_code}")
 
@@ -29,6 +30,7 @@ def scrape_data_point():
         data_point = "" if target_element is None else target_element.text
         loguru.logger.info(f"Data point: {data_point}")
         return data_point
+
 
 if __name__ == "__main__":
 
@@ -46,7 +48,7 @@ if __name__ == "__main__":
     # Load daily event monitor
     loguru.logger.info("Loading daily event monitor")
     dem = daily_event_monitor.DailyEventMonitor(
-        "data/full_news_json_list.json"
+        "data/daily_pennsylvanian_headlines.json"
     )
 
     # Run scrape

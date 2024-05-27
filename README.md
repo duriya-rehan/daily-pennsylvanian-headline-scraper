@@ -2,13 +2,12 @@
 
 ### Modification to Scrape the Top Headline from the "News" Section
 
-The original scraper was designed to scrape the main headline from The Daily Pennsylvanian homepage. However, we updated the scraper to target the top headline from the "News" section. 
+The original scraper was designed to scrape the main headline from The Daily Pennsylvanian homepage. However, we updated the scraper to target the top headline from the "Multimedia" section. 
 
 #### Changes Made:
 1. **Updated the `scrape_data_point()` function**:
-   - Instead of scraping the main headline, the function now searches for the top headline within the "News" section.
-   - The "News" section is identified by the `<section>` element with the id `news`.
-   - The headline is extracted from the first `<a>` element with the class `frontpage-link` within this section.
+   - Instead of scraping the main headline, the function now searches for the top headline within the "Multimedia" section.
+   - The "News" section is identified by the `<section>` element.
 
 
 This template provides a starting point for **git scraping**—the technique of scraping data from websites and automatically committing it to a Git repository using workflows, [coined by Simon Willison](https://simonwillison.net/2020/Oct/9/git-scraping/).
